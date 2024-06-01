@@ -52,7 +52,7 @@ namespace PowerliftingCompareResult.Controllers
                 }
                 // Pobierz 5 osób z lepszym wynikiem
                 var betterResults = GetBetterResults(eventName, inputTotal);
-                // Dodaj samego siebie
+                // Dodaj samego siebie poki co puste bo wszytsko leci w total i tpye
                 var userResult = new LiftResult
                 {
                     Name = "Your Result",
