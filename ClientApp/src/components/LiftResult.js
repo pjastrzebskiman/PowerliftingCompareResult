@@ -81,29 +81,27 @@ const YourResult = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Name</th>
-                                <th>Event</th>
+                                <th>Squat</th>
+                                <th>Benchpress</th>
+                                <th>Deadlift</th>
                                 <th>Total</th>
                                 <th>Sex</th>
                                 <th>Age</th>
                                 <th>Weight Class</th>
-                                <th>Division</th>
-                                <th>Place</th>
                             </tr>
                         </thead>
                         <tbody>
                             {results.map((result) => (
-                                <tr key={result.id}>
-                                    <td>{result.id}</td>
+                                <tr key={result.name}>
                                     <td>{result.name}</td>
-                                    <td>{result.event}</td>
+                                    <td>{result.squat}</td>
+                                    <td>{result.bench}</td>
+                                    <td>{result.deadlift}</td>
                                     <td>{result.total}</td>
                                     <td>{result.sex}</td>
                                     <td>{result.age}</td>
                                     <td>{result.weightClass}</td>
-                                    <td>{result.division}</td>
-                                    <td>{result.place}</td>
                                 </tr>
                             ))}
                         </tbody>

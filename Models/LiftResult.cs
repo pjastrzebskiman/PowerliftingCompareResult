@@ -14,5 +14,24 @@
         public float Total { get; set; }
         public string Sex { get; set; }
 
+        public float GetValueByEventName(string eventName)
+        {
+            switch (eventName)
+            {
+                 case "Total":
+                    return Total;
+                case "Squat":
+                    return Squat;
+                case "Bench":
+                    return Bench;
+                case "Deadlift":
+                    return Deadlift;
+                default:
+                    throw new ArgumentException("Invalid event name", nameof(eventName));
+            }
+        }
+
+
     }
+
 }

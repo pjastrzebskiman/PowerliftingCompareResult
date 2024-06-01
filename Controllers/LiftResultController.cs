@@ -23,6 +23,7 @@ namespace PowerliftingCompareResult.Controllers
         {
             try
             {
+
                 string eventName;
                 float inputTotal;
                 if (input.Total > 0)
@@ -49,29 +50,20 @@ namespace PowerliftingCompareResult.Controllers
                 {
                     return BadRequest("No valid input provided.");
                 }
-
-                var betterResults = liftResultModels
-                    .Where(lr => LiftHelper.GetValueBasedOnEvent(inputTotal, eventName) > inputTotal)
-                    .OrderBy(lr => LiftHelper.GetValueBasedOnEvent(inputTotal, eventName))
-                    .Take(5)
-                    .ToList();
-
-                // Dodaj wynik użytkownika
+                // Pobierz 5 osób z lepszym wynikiem
+                var betterResults = GetBetterResults(eventName, inputTotal);
+                // Dodaj samego siebie
                 var userResult = new LiftResult
                 {
                     Name = "Your Result",
-                    Total = inputTotal,
-                    Sex = "N/A",
-                    Age = 0,
-                    WeightClass = "N/A"
+                    Total = input.Total,
+                    Squat = input.Squat,
+                    Bench = input.Bench,
+                    Deadlift = input.Deadlift
                 };
 
                 // Pobierz 5 osób z gorszym wynikiem
-                var worseResults = liftResultModels
-                    .Where(lr => LiftHelper.GetValueBasedOnEvent(inputTotal, eventName) < inputTotal)
-                    .OrderByDescending(lr => LiftHelper.GetValueBasedOnEvent(inputTotal, eventName))
-                    .Take(5)
-                    .ToList();
+                var worseResults = GetWorstResults(eventName, inputTotal);
 
                 // Połącz wyniki
                 var results = betterResults.Concat(new List<LiftResult> { userResult }).Concat(worseResults).ToList();
@@ -80,11 +72,30 @@ namespace PowerliftingCompareResult.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception
                 Console.WriteLine($"Error in PostYourResult: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
 
+        }
+        private IEnumerable<LiftResult> GetBetterResults(string eventName, float inputThreshold)
+        {
+            var betterResults = liftResultModels
+                .Where(lr => lr.GetValueByEventName(eventName) >= inputThreshold)
+                .OrderBy(lr => lr.GetValueByEventName(eventName))
+                .Take(5)
+                .ToList();
+
+            return betterResults;
+        }
+        private IEnumerable<LiftResult> GetWorstResults(string eventName, float inputThreshold)
+        {
+            var betterResults = liftResultModels
+                .Where(lr => lr.GetValueByEventName(eventName) < inputThreshold)
+                .OrderBy(lr => lr.GetValueByEventName(eventName))
+                .Take(5)
+                .ToList();
+
+            return betterResults;
         }
 
     }
