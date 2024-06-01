@@ -1,0 +1,32 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+}
+
+tr {
+    background-color: #fff;
+}
+
+    tr:nth-of-type(even) {
+        background-color: #f4f4f4;
+    }
+
+    tr:hover {
+        background-color: #e2e2e2;
+    }
