@@ -19,6 +19,7 @@ namespace PowerliftingCompareResult.Controllers
         }
       };
 
+        [HttpPost]
         public IActionResult Post([FromBody] LiftInput input)
         {
             try
@@ -68,6 +69,7 @@ namespace PowerliftingCompareResult.Controllers
                 // Połącz wyniki
                 var results = betterResults.Concat(new List<LiftResult> { userResult }).Concat(worseResults).ToList();
 
+
                 return Ok(results);
             }
             catch (Exception ex)
@@ -97,6 +99,9 @@ namespace PowerliftingCompareResult.Controllers
 
             return betterResults;
         }
+
+
+
 
     }
 }
