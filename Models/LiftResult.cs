@@ -8,19 +8,19 @@
         public string AgeClass { get; set; }
         public float BodyWeight { get; set; }
         public string WeightClass { get; set; }
-        public float Squat1 { get; set; }
-        public float Squat2 { get; set; }
-        public float Squat3 { get; set; }
-        public float Bench1 { get; set; }
-        public float Bench2 { get; set; }
-        public float Bench3 { get; set; }
-        public float Deadlift1 { get; set; }
-        public float Deadlift2 { get; set; }
-        public float Deadlift3 { get; set; }
-        public float Squat { get; set; }
-        public float Bench { get; set; }
-        public float Deadlift { get; set; }
-        public float Total { get; set; }
+        public float ?Squat1 { get; set; }
+        public float ?Squat2 { get; set; }
+        public float ?Squat3 { get; set; }
+        public float ?Bench1 { get; set; }
+        public float ?Bench2 { get; set; }
+        public float ?Bench3 { get; set; }
+        public float ?Deadlift1 { get; set; }
+        public float ?Deadlift2 { get; set; }
+        public float ?Deadlift3 { get; set; }
+        public float ?Squat { get; set; }
+        public float ?Bench { get; set; }
+        public float ?Deadlift { get; set; }
+        public float ?Total { get; set; }
         public string Sex { get; set; }
         public string Country { get; set; }
         public string Federation { get; set; }
@@ -33,13 +33,13 @@
             switch (eventName)
             {
                  case "Total":
-                    return Total;
+                    return Total?? 0f;
                 case "Squat":
-                    return Squat;
+                    return Squat?? 0f;
                 case "Bench":
-                    return Bench;
+                    return Bench?? 0f;
                 case "Deadlift":
-                    return Deadlift;
+                    return Deadlift ?? 0f;
                 default:
                     throw new ArgumentException("Invalid event name", nameof(eventName));
             }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerliftingCompareResult.Models;
 
@@ -11,9 +12,11 @@ using PowerliftingCompareResult.Models;
 namespace PowerliftingCompareResult.Migrations
 {
     [DbContext(typeof(ResultContext))]
-    partial class ResultContextModelSnapshot : ModelSnapshot
+    [Migration("20240817143808_AlterAgeColumn")]
+    partial class AlterAgeColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,22 +27,22 @@ namespace PowerliftingCompareResult.Migrations
 
             modelBuilder.Entity("PowerliftingCompareResult.Models.LiftResult", b =>
                 {
-                    b.Property<float>("Age")
-                        .HasColumnType("real");
+                    b.Property<string>("Age")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AgeClass")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("Bench")
+                    b.Property<float>("Bench")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Bench1")
+                    b.Property<float>("Bench1")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Bench2")
+                    b.Property<float>("Bench2")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Bench3")
+                    b.Property<float>("Bench3")
                         .HasColumnType("real");
 
                     b.Property<float>("BodyWeight")
@@ -51,16 +54,16 @@ namespace PowerliftingCompareResult.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<float?>("Deadlift")
+                    b.Property<float>("Deadlift")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Deadlift1")
+                    b.Property<float>("Deadlift1")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Deadlift2")
+                    b.Property<float>("Deadlift2")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Deadlift3")
+                    b.Property<float>("Deadlift3")
                         .HasColumnType("real");
 
                     b.Property<string>("EQ")
@@ -81,19 +84,19 @@ namespace PowerliftingCompareResult.Migrations
                     b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float?>("Squat")
+                    b.Property<float>("Squat")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Squat1")
+                    b.Property<float>("Squat1")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Squat2")
+                    b.Property<float>("Squat2")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Squat3")
+                    b.Property<float>("Squat3")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Total")
+                    b.Property<float>("Total")
                         .HasColumnType("real");
 
                     b.Property<string>("WeightClass")
