@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using PowerliftingCompareResult.Models;
 using System.Data;
+using System.IO;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -31,7 +32,7 @@ namespace PowerliftingCompareResult.Controllers
 
                 if (isSuccess)
                 {
-                    return Ok();
+                    return NoContent();
                 }
                 else
                 {
@@ -49,32 +50,6 @@ namespace PowerliftingCompareResult.Controllers
         {
             try
             {
-                /*  DataTable dataTable = new DataTable();
-                  using (StreamReader sr = new StreamReader(csvFilePath))
-                  {
-                      string[] headers = sr.ReadLine().Split(',');
-                      var selectedIndexes = headers.Select((header, index) => new { header, index })
-                          .Where(h => selectedColumns.Contains(h.header))
-                          .Select(h => h.index)
-                          .ToList();
-                      foreach (var column in selectedColumns)
-                      {
-                          dataTable.Columns.Add(column);
-                      }
-
-                      while (!sr.EndOfStream)
-                      {
-                          string[] rows = sr.ReadLine().Split(',');
-                          DataRow dr = dataTable.NewRow();
-                          for (int i = 0; i < selectedIndexes.Count; i++)
-                          {
-                              dr[i] = rows[selectedIndexes[i]];
-                          }
-                          dataTable.Rows.Add(dr);
-                      }*/
-
-                //
-
                 DataTable dataTable = new DataTable();
 
                 // Definiowanie typów danych dla wybranych kolumn
@@ -86,7 +61,7 @@ namespace PowerliftingCompareResult.Controllers
     { "Age", typeof(float) },
     { "AgeClass", typeof(string) },
     { "BodyweightKg", typeof(float) },
-    { "WeightClassKg", typeof(float) },
+    { "WeightClassKg", typeof(string) },
     { "Squat1Kg", typeof(float) },
     { "Squat2Kg", typeof(float) },
     { "Squat3Kg", typeof(float) },
@@ -128,6 +103,9 @@ namespace PowerliftingCompareResult.Controllers
                         }
                     }
 
+                    int rowCount = 0; // Licznik przetworzonych wierszy
+                    int logInterval = 1000; // Jak często logować (co 1000 wierszy)
+
                     // Wypełnianie DataTable
                     while (!sr.EndOfStream)
                     {
@@ -148,9 +126,18 @@ namespace PowerliftingCompareResult.Controllers
                                     if (targetType == typeof(float) || targetType == typeof(double) || targetType == typeof(decimal))
                                     {
                                         // Użyj konwersji z CultureInfo.InvariantCulture dla typów zmiennoprzecinkowych
-                                        dr[columnName] = Convert.ChangeType(
-                                            Convert.ToDouble(cellValue, System.Globalization.CultureInfo.InvariantCulture),
-                                            targetType);
+                                        if (string.IsNullOrWhiteSpace(cellValue))
+                                        {
+                                            // Jeśli cellValue jest pusty, ustaw DBNull.Value lub domyślną wartość
+                                            dr[columnName] = DBNull.Value; // Lub np. 0f dla domyślnej wartości
+                                        }
+                                        else
+                                        {
+                                            // Użyj konwersji z CultureInfo.InvariantCulture dla typów zmiennoprzecinkowych
+                                            dr[columnName] = Convert.ChangeType(
+                                                Convert.ToDouble(cellValue, System.Globalization.CultureInfo.InvariantCulture),
+                                                targetType);
+                                        }
                                     }
                                     else
                                     {
@@ -170,13 +157,23 @@ namespace PowerliftingCompareResult.Controllers
                             }
                         }
                         dataTable.Rows.Add(dr);
+                        rowCount++; // Zwiększenie licznika wierszy
+                                    // Logowanie co określoną liczbę wierszy
+                        if (rowCount % logInterval == 0)
+                        {
+                            Console.WriteLine($"{rowCount} rows processed.");
+                        }
+                       
                     }
+                    sr.Dispose();
                 }
-
+              
 
                 //
+             //   dataTable.EndLoadData();
 
-                    var columnMappings = new Dictionary<string, string>
+
+                var columnMappings = new Dictionary<string, string>
                     {
                         { "Name", "Name" },
                         { "Equipment", "EQ" },
@@ -206,9 +203,15 @@ namespace PowerliftingCompareResult.Controllers
                     };
 
 
+                int batchSize = 100000;
+                int totalRows = dataTable.Rows.Count;
+                int batchCount = (int)Math.Ceiling((double)totalRows / batchSize);
+
                 using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    for (int batchIndex = 0; batchIndex < batchCount; batchIndex++)
                     {
-                        connection.Open();
                         using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connection))
                         {
                             bulkCopy.DestinationTableName = TableName;
@@ -224,24 +227,37 @@ namespace PowerliftingCompareResult.Controllers
 
                             try
                             {
-                                bulkCopy.WriteToServer(dataTable);
+                                // bulkCopy.WriteToServer(dataTable);
+                                bulkCopy.WriteToServer(dataTable.AsEnumerable()
+                              .Skip(batchIndex * batchSize)
+                              .Take(batchSize)
+                              .CopyToDataTable());
+                                Console.WriteLine($"Batch {batchIndex + 1} of {batchCount} processed successfully.");
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Error during bulk copy: {ex.Message}");
                             }
-
+                            bulkCopy.Close();
                         }
 
-                    }
-                    return true;
-                //}
 
+                    }
+                    dataTable.Clear();
+                    dataTable.Dispose();
+                    connection.Dispose();
+                    return true;
+                   
+                    //}
+
+                }
+          
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return false;
+
             }
         }
     }
