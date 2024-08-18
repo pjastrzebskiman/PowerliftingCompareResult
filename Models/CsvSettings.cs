@@ -1,4 +1,5 @@
-﻿namespace PowerliftingCompareResult.Models
+﻿#nullable disable
+namespace PowerliftingCompareResult.Models
 {
     public class CsvSettings
     {

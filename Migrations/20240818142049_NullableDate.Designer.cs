@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PowerliftingCompareResult.Models;
 
@@ -11,9 +12,11 @@ using PowerliftingCompareResult.Models;
 namespace PowerliftingCompareResult.Migrations
 {
     [DbContext(typeof(ResultContext))]
-    partial class ResultContextModelSnapshot : ModelSnapshot
+    [Migration("20240818142049_NullableDate")]
+    partial class NullableDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
