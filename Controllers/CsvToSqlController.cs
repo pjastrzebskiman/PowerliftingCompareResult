@@ -144,11 +144,19 @@ namespace PowerliftingCompareResult.Controllers
 
                         using (StreamReader sr = new StreamReader(csvFilePath))
                         {
+                            // Odczyt nagłówków i stworzenie mapy nazwa kolumny -> indeks
                             string[] headers = sr.ReadLine().Split(',');
-                            var selectedIndexes = headers.Select((header, index) => new { header, index })
-                                .Where(h => selectedColumns.Contains(h.header))
-                                .Select(h => h.index)
-                                .ToList();
+                            var headerIndexMap = headers.Select((header, index) => new { header, index })
+                                .ToDictionary(h => h.header, h => h.index);
+
+                            // Sprawdzenie, czy wszystkie wybrane kolumny istnieją w pliku CSV
+                            foreach (var column in selectedColumns)
+                            {
+                                if (!headerIndexMap.ContainsKey(column))
+                                {
+                                    throw new Exception($"Kolumna '{column}' nie istnieje w pliku CSV.");
+                                }
+                            }
 
                             int rowCount = 0;
                             int totalRowCount = 0;
@@ -158,10 +166,10 @@ namespace PowerliftingCompareResult.Controllers
                                 string[] rows = sr.ReadLine().Split(',');
                                 DataRow dr = dataTable.NewRow();
 
-                                for (int i = 0; i < selectedIndexes.Count; i++)
+                                foreach (var columnName in selectedColumns)
                                 {
-                                    string columnName = selectedColumns[i];
-                                    string cellValue = rows[selectedIndexes[i]];
+                                    int columnIndex = headerIndexMap[columnName];
+                                    string cellValue = rows[columnIndex];
 
                                     // Przypisanie wartości z konwersją na odpowiedni typ
                                     if (columnTypeMapping.ContainsKey(columnName))
@@ -200,7 +208,7 @@ namespace PowerliftingCompareResult.Controllers
                                         }
                                         catch (Exception ex)
                                         {
-                                            Console.WriteLine($"Error column convert '{columnName}' with value '{cellValue}': {ex.Message}");
+                                            Console.WriteLine($"Error converting column '{columnName}' with value '{cellValue}': {ex.Message}");
                                             dr[columnName] = DBNull.Value;
                                         }
                                     }
@@ -222,7 +230,7 @@ namespace PowerliftingCompareResult.Controllers
                                         bulkCopy.WriteToServer(dataTable);
                                         dataTable.Clear();
                                         rowCount = 0;
-                                        Console.WriteLine($"{totalRowCount} rows processed and save to databaseh.");
+                                        Console.WriteLine($"{totalRowCount} rows processed and saved to database.");
                                     }
                                     catch (Exception ex)
                                     {
@@ -239,7 +247,7 @@ namespace PowerliftingCompareResult.Controllers
                                 {
                                     bulkCopy.WriteToServer(dataTable);
                                     dataTable.Clear();
-                                    Console.WriteLine($"Last part {dataTable.Rows.Count} rows processed and save to database.");
+                                    Console.WriteLine($"Last part {dataTable.Rows.Count} rows processed and saved to database.");
                                 }
                                 catch (Exception ex)
                                 {
