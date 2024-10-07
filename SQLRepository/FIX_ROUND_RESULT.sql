@@ -32,6 +32,7 @@ WHERE
     ABS(Total - FLOOR(Total) - 0.01) < 0.001 OR 
     ABS(Total - FLOOR(Total) - 0.48) < 0.001 OR 
     ABS(Total - FLOOR(Total) - 0.92) < 0.001 OR
+    ABS(Total - FLOOR(Total) - 0.93) < 0.001 OR
 
     ABS(Squat - FLOOR(Squat) - 0.99) < 0.001 OR 
     ABS(Squat - FLOOR(Squat) - 0.98) < 0.001 OR 
@@ -40,6 +41,7 @@ WHERE
     ABS(Squat - FLOOR(Squat) - 0.01) < 0.001 OR 
     ABS(Squat - FLOOR(Squat) - 0.48) < 0.001 OR 
     ABS(Squat - FLOOR(Squat) - 0.92) < 0.001 OR
+    ABS(Squat - FLOOR(Squat) - 0.93) < 0.001 OR
 
     ABS(Bench - FLOOR(Bench) - 0.99) < 0.001 OR 
     ABS(Bench - FLOOR(Bench) - 0.98) < 0.001 OR 
@@ -48,6 +50,7 @@ WHERE
     ABS(Bench - FLOOR(Bench) - 0.01) < 0.001 OR 
     ABS(Bench - FLOOR(Bench) - 0.48) < 0.001 OR 
     ABS(Bench - FLOOR(Bench) - 0.92) < 0.001 OR
+    ABS(Bench - FLOOR(Bench) - 0.93) < 0.001 OR
 
     ABS(Deadlift - FLOOR(Deadlift) - 0.99) < 0.001 OR 
     ABS(Deadlift - FLOOR(Deadlift) - 0.98) < 0.001 OR 
@@ -55,7 +58,7 @@ WHERE
     ABS(Deadlift - FLOOR(Deadlift) - 0.02) < 0.001 OR 
     ABS(Deadlift - FLOOR(Deadlift) - 0.01) < 0.001 OR 
     ABS(Deadlift - FLOOR(Deadlift) - 0.48) < 0.001 OR 
-    ABS(Deadlift - FLOOR(Deadlift) - 0.92) < 0.001;
+    ABS(Deadlift - FLOOR(Deadlift) - 0.93) < 0.001;
 
 END
 
