@@ -26,7 +26,10 @@ const YourResult = () => {
             data.deadlift = parseFloat(deadlift);
         } else if (type === 'total') {
             if (squat && bench && deadlift) {
-                data.total = parseFloat(squat) + parseFloat(bench) + parseFloat(deadlift);
+                data.squat = parseFloat(squat);
+                data.bench = parseFloat(bench);
+                data.deadlift = parseFloat(deadlift);
+                data.total = data.squat + data.bench + data.deadlift;
             } else {
                 setError('Please enter values for all lifts to compare total.');
                 return;
