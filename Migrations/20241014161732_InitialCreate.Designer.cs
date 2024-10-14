@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PowerliftingCompareResult.Models;
 
 #nullable disable
@@ -12,8 +12,8 @@ using PowerliftingCompareResult.Models;
 namespace PowerliftingCompareResult.Migrations
 {
     [DbContext(typeof(ResultContext))]
-    [Migration("20240818142049_NullableDate")]
-    partial class NullableDate
+    [Migration("20241014161732_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,9 +21,9 @@ namespace PowerliftingCompareResult.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("PowerliftingCompareResult.Models.LiftResult", b =>
                 {
@@ -31,7 +31,7 @@ namespace PowerliftingCompareResult.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("AgeClass")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<float?>("Bench")
                         .HasColumnType("real");
@@ -49,10 +49,10 @@ namespace PowerliftingCompareResult.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<float?>("Deadlift")
                         .HasColumnType("real");
@@ -67,22 +67,22 @@ namespace PowerliftingCompareResult.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("EQ")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Federation")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MeetCountry")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MeetName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Sex")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<float?>("Squat")
                         .HasColumnType("real");
@@ -100,7 +100,7 @@ namespace PowerliftingCompareResult.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("WeightClass")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.ToTable("LiftResults");
                 });
