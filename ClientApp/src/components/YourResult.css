@@ -84,3 +84,6 @@
     font-weight: bold;
     margin-top: 15px;
 }
+.result-table tr.highlight {
+    background-color: #FFE4B5;
+}

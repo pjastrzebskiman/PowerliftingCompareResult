@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './YourResult.css';
 
 const YourResult = () => {
@@ -7,6 +7,9 @@ const YourResult = () => {
     const [bench, setBench] = useState('');
     const [deadlift, setDeadlift] = useState('');
     const [error, setError] = useState('');
+    const [gender, setGender] = useState('M');
+    const [countries, setCountries] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState('');
 
     const handleCompare = (type) => {
         setError('');
@@ -15,7 +18,9 @@ const YourResult = () => {
             squat: 0,
             bench: 0,
             deadlift: 0,
-            total: 0
+            total: 0,
+            gender: gender,
+            country: selectedCountry
         };
 
         if (type === 'squat' && squat) {
@@ -54,7 +59,22 @@ const YourResult = () => {
             })
             .then(data => setResults(data))
             .catch(error => setError('Error posting data: ' + error.message));
+
     };
+
+    useEffect(() => {
+        fetch('/LiftResult/GetCountries')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch countries');
+                }
+                return response.json();
+            })
+            .then(data => setCountries(data))
+            .catch(error => console.error('Error fetching countries:', error));
+    }, []);
+
+
 
     return (
         <div className="container">
@@ -75,6 +95,24 @@ const YourResult = () => {
                     <button type="button" onClick={() => handleCompare('deadlift')}>Compare Deadlift</button>
                 </div>
                 <button type="button" onClick={() => handleCompare('total')}>Compare Total</button>
+                <div className="input-group">
+                    <label>Sex: </label>
+                    <select value={gender} onChange={(e) => setGender(e.target.value)}>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+                <div className="input-group">
+                    <label>Country: </label>
+                    <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)}>
+                        <option value="">All countries</option>
+                        {countries.map((country) => (
+                            <option key={country} value={country}>
+                                {country}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </form>
 
             {error && <p className="error">{error}</p>}
@@ -101,7 +139,10 @@ const YourResult = () => {
                         </thead>
                         <tbody>
                             {results.map((result) => (
-                                <tr key={result.name}>
+                                <tr
+                                    key={result.name}
+                                    className={result.name === "Your Result" ? "highlight" : ""}
+                                >
                                     <td>{result.name}</td>
                                     <td>{result.age}</td>
                                     <td>{result.ageClass}</td>
