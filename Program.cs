@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ResultContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ResultContextConnectionString")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ResultContextConnectionString")));
 
 builder.Services.Configure<CsvSettings>(builder.Configuration.GetSection("ImportFormCsv"));
 builder.Services.AddEndpointsApiExplorer();
