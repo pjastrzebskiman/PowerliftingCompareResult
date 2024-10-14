@@ -2,6 +2,7 @@
 using PowerliftingCompareResult.Models;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace PowerliftingCompareResult.Controllers
 {
@@ -49,7 +50,7 @@ namespace PowerliftingCompareResult.Controllers
                     return BadRequest("No valid input provided.");
                 }
 
-                var betterResults = GetBetterResults(eventName, inputTotal);
+                var betterResults = GetBetterResults(eventName, inputTotal,input.Gender,input.Country);
 
                 var userResult = new LiftResult
                 {
@@ -57,10 +58,9 @@ namespace PowerliftingCompareResult.Controllers
                     Total = input.Total,
                     Squat = input.Squat,
                     Bench = input.Bench,
-                    Deadlift = input.Deadlift
-                };
+                    Deadlift = input.Deadlift                };
 
-                var worseResults = GetWorstResults(eventName, inputTotal);
+                var worseResults = GetWorstResults(eventName, inputTotal,input.Gender,input.Country);
 
                 var results = betterResults.Concat(new List<LiftResult> { userResult }).Concat(worseResults).ToList();
 
@@ -90,44 +90,44 @@ namespace PowerliftingCompareResult.Controllers
             }
         }
 
-        private Expression<Func<LiftResult, bool>> GetBetterPredicate(string eventName, float inputThreshold)
+        private Expression<Func<LiftResult, bool>> GetBetterPredicate(string eventName, float inputThreshold,string gender, string country)
         {
             switch (eventName)
             {
                 case "Total":
-                    return lr => lr.Total >= inputThreshold;
+                    return lr => lr.Total >= inputThreshold && lr.Sex== gender &&(string.IsNullOrEmpty(country) || lr.Country == country);
                 case "Squat":
-                    return lr => lr.Squat >= inputThreshold;
+                    return lr => lr.Squat >= inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 case "Bench":
-                    return lr => lr.Bench >= inputThreshold;
+                    return lr => lr.Bench >= inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 case "Deadlift":
-                    return lr => lr.Deadlift >= inputThreshold;
+                    return lr => lr.Deadlift >= inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 default:
                     throw new ArgumentException("Invalid event name");
             }
         }
 
-        private Expression<Func<LiftResult, bool>> GetWorstPredicate(string eventName, float inputThreshold)
+        private Expression<Func<LiftResult, bool>> GetWorstPredicate(string eventName, float inputThreshold,string gender, string country)
         {
             switch (eventName)
             {
                 case "Total":
-                    return lr => lr.Total < inputThreshold;
+                    return lr => lr.Total < inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 case "Squat":
-                    return lr => lr.Squat < inputThreshold;
+                    return lr => lr.Squat < inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 case "Bench":
-                    return lr => lr.Bench < inputThreshold;
+                    return lr => lr.Bench < inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 case "Deadlift":
-                    return lr => lr.Deadlift < inputThreshold;
+                    return lr => lr.Deadlift < inputThreshold && lr.Sex == gender && (string.IsNullOrEmpty(country) || lr.Country == country); ;
                 default:
                     throw new ArgumentException("Invalid event name");
             }
         }
 
-        private IEnumerable<LiftResult> GetBetterResults(string eventName, float inputThreshold)
+        private IEnumerable<LiftResult> GetBetterResults(string eventName, float inputThreshold,string gender, string country)
         {
             var selector = GetSelector(eventName);
-            var predicate = GetBetterPredicate(eventName, inputThreshold);
+            var predicate = GetBetterPredicate(eventName, inputThreshold,gender,country);
 
             var betterResults = _context.LiftResults
                 .Where(predicate)
@@ -138,10 +138,10 @@ namespace PowerliftingCompareResult.Controllers
             return betterResults;
         }
 
-        private IEnumerable<LiftResult> GetWorstResults(string eventName, float inputThreshold)
+        private IEnumerable<LiftResult> GetWorstResults(string eventName, float inputThreshold, string gender,string country)
         {
             var selector = GetSelector(eventName);
-            var predicate = GetWorstPredicate(eventName, inputThreshold);
+            var predicate = GetWorstPredicate(eventName, inputThreshold,gender,country);
 
             var worseResults = _context.LiftResults
                 .Where(predicate)
@@ -150,6 +150,27 @@ namespace PowerliftingCompareResult.Controllers
                 .ToList();
 
             return worseResults;
+        }
+        [HttpGet("GetCountries")]
+        public IActionResult GetCountries()
+        {
+            try
+            {
+                var countries = _context.LiftResults
+      .Where(lr => lr.Country != null && lr.Country != "")
+      .Select(lr => lr.Country)
+      .Distinct()
+      .OrderBy(c => c)
+      .ToList();
+
+
+                return Ok(countries);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetCountries: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }
