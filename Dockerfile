@@ -15,7 +15,7 @@ FROM node:16 AS build-frontend
 WORKDIR /app
 
 # Copy frontend package.json and package-lock.json (if exists) to the container
-COPY ./clientapp/package*.json ./
+COPY ./ClientApp/package*.json ./
 RUN npm install
 
 # Copy the rest of the frontend files and build it
