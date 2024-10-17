@@ -134,8 +134,14 @@ namespace PowerliftingCompareResult.Controllers
                         ColumnType = columnTypeMapping.ContainsKey(columnName) ? columnTypeMapping[columnName] : typeof(string)
                     }).ToList();
 
+
+                    string TableName2 = "public.\"LiftResults\"";
+
                     // Konstrukcja polecenia COPY
-                    string copyCommand = $"COPY {TableName} ({string.Join(",", columnsToWrite.Select(c => c.TargetColumnName))}) FROM STDIN (FORMAT BINARY)";
+                    string copyCommand = $"COPY {TableName2} ({string.Join(",", columnsToWrite.Select(c => "\"" + c.TargetColumnName + "\""))}) FROM STDIN (FORMAT BINARY)";
+
+                    Console.WriteLine($"Polecenie COPY: {copyCommand}");
+
 
                     using (var writer = connection.BeginBinaryImport(copyCommand))
                     {
