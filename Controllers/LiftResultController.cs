@@ -151,6 +151,7 @@ namespace PowerliftingCompareResult.Controllers
 
             return worseResults;
         }
+        
         [HttpGet("GetCountries")]
         public IActionResult GetCountries()
         {

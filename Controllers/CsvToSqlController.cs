@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using Npgsql;
+using NpgsqlTypes;
 using PowerliftingCompareResult.Models;
-using System.Data;
+using System;
+using System.Collections.Generic;
 using System.IO;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Linq;
 
 namespace PowerliftingCompareResult.Controllers
 {
@@ -13,7 +14,6 @@ namespace PowerliftingCompareResult.Controllers
     [ApiController]
     public class CsvToSqlController : ControllerBase
     {
-
         private readonly CsvSettings _csvToSql;
 
         public CsvToSqlController(IOptions<CsvSettings> csvToSql)
@@ -21,8 +21,6 @@ namespace PowerliftingCompareResult.Controllers
             _csvToSql = csvToSql.Value;
         }
 
-
-        // [HttpPost("execute")]
         [HttpPost]
         public IActionResult PostDataFromFile()
         {
@@ -52,102 +50,108 @@ namespace PowerliftingCompareResult.Controllers
             {
                 // Definiowanie typów danych dla wybranych kolumn
                 var columnTypeMapping = new Dictionary<string, Type>
-        {
-            { "Name", typeof(string) },
-            { "Sex", typeof(string) },
-            { "Equipment", typeof(string) },
-            { "Age", typeof(float) },
-            { "AgeClass", typeof(string) },
-            { "BodyweightKg", typeof(float) },
-            { "WeightClassKg", typeof(string) },
-            { "Squat1Kg", typeof(float) },
-            { "Squat2Kg", typeof(float) },
-            { "Squat3Kg", typeof(float) },
-            { "Bench1Kg", typeof(float) },
-            { "Bench2Kg", typeof(float) },
-            { "Bench3Kg", typeof(float) },
-            { "Deadlift1Kg", typeof(float) },
-            { "Deadlift2Kg", typeof(float) },
-            { "Deadlift3Kg", typeof(float) },
-            { "Best3SquatKg", typeof(float) },
-            { "Best3BenchKg", typeof(float) },
-            { "Best3DeadliftKg", typeof(float) },
-            { "TotalKg", typeof(float) },
-            { "Country", typeof(string) },
-            { "Federation", typeof(string) },
-            { "Date", typeof(DateTime) },
-            { "MeetCountry", typeof(string) },
-            { "MeetName", typeof(string) }
-        };
+                {
+                    { "Name", typeof(string) },
+                    { "Sex", typeof(string) },
+                    { "Equipment", typeof(string) },
+                    { "Age", typeof(float) },
+                    { "AgeClass", typeof(string) },
+                    { "BodyweightKg", typeof(float) },
+                    { "WeightClassKg", typeof(string) },
+                    { "Squat1Kg", typeof(float) },
+                    { "Squat2Kg", typeof(float) },
+                    { "Squat3Kg", typeof(float) },
+                    { "Bench1Kg", typeof(float) },
+                    { "Bench2Kg", typeof(float) },
+                    { "Bench3Kg", typeof(float) },
+                    { "Deadlift1Kg", typeof(float) },
+                    { "Deadlift2Kg", typeof(float) },
+                    { "Deadlift3Kg", typeof(float) },
+                    { "Best3SquatKg", typeof(float) },
+                    { "Best3BenchKg", typeof(float) },
+                    { "Best3DeadliftKg", typeof(float) },
+                    { "TotalKg", typeof(float) },
+                    { "Country", typeof(string) },
+                    { "Federation", typeof(string) },
+                    { "Date", typeof(DateTime) },
+                    { "MeetCountry", typeof(string) },
+                    { "MeetName", typeof(string) }
+                };
 
-                // Mappings kolumn do bazy danych
+                // Mapowanie kolumn do bazy danych
                 var columnMappings = new Dictionary<string, string>
-        {
-            { "Name", "Name" },
-            { "Equipment", "EQ" },
-            { "Age", "Age" },
-            { "AgeClass", "AgeClass" },
-            { "Sex", "Sex" },
-            { "BodyweightKg", "BodyWeight" },
-            { "WeightClassKg", "WeightClass" },
-            { "Squat1Kg", "Squat1" },
-            { "Squat2Kg", "Squat2" },
-            { "Squat3Kg", "Squat3" },
-            { "Bench1Kg", "Bench1" },
-            { "Bench2Kg", "Bench2" },
-            { "Bench3Kg", "Bench3" },
-            { "Deadlift1Kg", "Deadlift1" },
-            { "Deadlift2Kg", "Deadlift2" },
-            { "Deadlift3Kg", "Deadlift3" },
-            { "Best3SquatKg", "Squat" },
-            { "Best3BenchKg", "Bench" },
-            { "Best3DeadliftKg", "Deadlift" },
-            { "TotalKg", "Total" },
-            { "Country", "Country" },
-            { "Federation", "Federation" },
-            { "Date", "Date" },
-            { "MeetCountry", "MeetCountry" },
-            { "MeetName", "MeetName" }
-        };
+                {
+                    { "Name", "Name" },
+                    { "Equipment", "EQ" },
+                    { "Age", "Age" },
+                    { "AgeClass", "AgeClass" },
+                    { "Sex", "Sex" },
+                    { "BodyweightKg", "BodyWeight" },
+                    { "WeightClassKg", "WeightClass" },
+                    { "Squat1Kg", "Squat1" },
+                    { "Squat2Kg", "Squat2" },
+                    { "Squat3Kg", "Squat3" },
+                    { "Bench1Kg", "Bench1" },
+                    { "Bench2Kg", "Bench2" },
+                    { "Bench3Kg", "Bench3" },
+                    { "Deadlift1Kg", "Deadlift1" },
+                    { "Deadlift2Kg", "Deadlift2" },
+                    { "Deadlift3Kg", "Deadlift3" },
+                    { "Best3SquatKg", "Squat" },
+                    { "Best3BenchKg", "Bench" },
+                    { "Best3DeadliftKg", "Deadlift" },
+                    { "TotalKg", "Total" },
+                    { "Country", "Country" },
+                    { "Federation", "Federation" },
+                    { "Date", "Date" },
+                    { "MeetCountry", "MeetCountry" },
+                    { "MeetName", "MeetName" }
+                };
 
-                int batchSize = 10000; // Ustal rozmiar partii według potrzeb
+                // Mapowanie System.Type na NpgsqlDbType
+                var typeMapping = new Dictionary<Type, NpgsqlDbType>
+                {
+                    { typeof(string), NpgsqlDbType.Text },
+                    { typeof(int), NpgsqlDbType.Integer },
+                    { typeof(long), NpgsqlDbType.Bigint },
+                    { typeof(float), NpgsqlDbType.Real },
+                    { typeof(double), NpgsqlDbType.Double },
+                    { typeof(decimal), NpgsqlDbType.Numeric },
+                    { typeof(bool), NpgsqlDbType.Boolean },
+                    { typeof(DateTime), NpgsqlDbType.Timestamp },
+                    // Dodaj inne mapowania typów, jeśli potrzebne
+                };
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
 
-                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy(connection))
+                    // Przygotowanie listy kolumn do wstawienia
+                    var columnsToWrite = selectedColumns.Select(columnName => new
                     {
-                        bulkCopy.DestinationTableName = TableName;
+                        SourceColumnName = columnName,
+                        TargetColumnName = columnMappings[columnName],
+                        ColumnType = columnTypeMapping.ContainsKey(columnName) ? columnTypeMapping[columnName] : typeof(string)
+                    }).ToList();
 
-                        // Dodaj mapowania kolumn
-                        foreach (var mapping in columnMappings)
-                        {
-                            bulkCopy.ColumnMappings.Add(mapping.Key, mapping.Value);
-                        }
 
-                        // Inicjalizuj DataTable
-                        DataTable dataTable = new DataTable();
+                    string TableName2 = "public.\"LiftResults\"";
 
-                        // Dodaj kolumny do DataTable
-                        foreach (var column in selectedColumns)
-                        {
-                            if (columnTypeMapping.ContainsKey(column))
-                            {
-                                dataTable.Columns.Add(column, columnTypeMapping[column]);
-                            }
-                            else
-                            {
-                                dataTable.Columns.Add(column, typeof(string)); // Domyślnie string
-                            }
-                        }
+                    // Konstrukcja polecenia COPY
+                    string copyCommand = $"COPY {TableName2} ({string.Join(",", columnsToWrite.Select(c => "\"" + c.TargetColumnName + "\""))}) FROM STDIN (FORMAT BINARY)";
 
+                    Console.WriteLine($"Polecenie COPY: {copyCommand}");
+
+
+                    using (var writer = connection.BeginBinaryImport(copyCommand))
+                    {
                         using (StreamReader sr = new StreamReader(csvFilePath))
                         {
                             // Odczyt nagłówków i stworzenie mapy nazwa kolumny -> indeks
-                            string[] headers = sr.ReadLine().Split(',');
+                            string headerLine = sr.ReadLine();
+                            string[] headers = headerLine.Split(',');
                             var headerIndexMap = headers.Select((header, index) => new { header, index })
-                                .ToDictionary(h => h.header, h => h.index);
+                                                        .ToDictionary(h => h.header, h => h.index);
 
                             // Sprawdzenie, czy wszystkie wybrane kolumny istnieją w pliku CSV
                             foreach (var column in selectedColumns)
@@ -158,114 +162,103 @@ namespace PowerliftingCompareResult.Controllers
                                 }
                             }
 
-                            int rowCount = 0;
                             int totalRowCount = 0;
 
                             while (!sr.EndOfStream)
                             {
-                                string[] rows = sr.ReadLine().Split(',');
-                                DataRow dr = dataTable.NewRow();
+                                string line = sr.ReadLine();
+                                if (string.IsNullOrWhiteSpace(line))
+                                    continue; // Pomijanie pustych linii
 
-                                foreach (var columnName in selectedColumns)
+                                string[] rows = line.Split(',');
+
+                                // Rozpoczęcie nowego wiersza w imporcie
+                                writer.StartRow();
+
+                                foreach (var column in columnsToWrite)
                                 {
-                                    int columnIndex = headerIndexMap[columnName];
+                                    string sourceColumnName = column.SourceColumnName;
+                                    int columnIndex = headerIndexMap[sourceColumnName];
                                     string cellValue = rows[columnIndex];
 
-                                    // Przypisanie wartości z konwersją na odpowiedni typ
-                                    if (columnTypeMapping.ContainsKey(columnName))
+                                    Type targetType = column.ColumnType;
+
+                                    // Konwersja wartości komórki na odpowiedni typ
+                                    object value = null;
+                                    try
                                     {
-                                        Type targetType = columnTypeMapping[columnName];
-                                        try
+                                        if (string.IsNullOrWhiteSpace(cellValue))
                                         {
-                                            if (targetType == typeof(float) || targetType == typeof(double) || targetType == typeof(decimal))
+                                            value = DBNull.Value;
+                                        }
+                                        else if (targetType == typeof(float) || targetType == typeof(double) || targetType == typeof(decimal))
+                                        {
+                                            value = Convert.ChangeType(Convert.ToDouble(cellValue, System.Globalization.CultureInfo.InvariantCulture), targetType);
+                                        }
+                                        else if (targetType == typeof(int) || targetType == typeof(long))
+                                        {
+                                            value = Convert.ChangeType(Convert.ToInt64(cellValue, System.Globalization.CultureInfo.InvariantCulture), targetType);
+                                        }
+                                        else if (targetType == typeof(DateTime))
+                                        {
+                                            if (DateTime.TryParse(cellValue, out DateTime dateValue))
                                             {
-                                                if (string.IsNullOrWhiteSpace(cellValue))
-                                                {
-                                                    dr[columnName] = DBNull.Value;
-                                                }
-                                                else
-                                                {
-                                                    dr[columnName] = Convert.ChangeType(
-                                                        Convert.ToDouble(cellValue, System.Globalization.CultureInfo.InvariantCulture),
-                                                        targetType);
-                                                }
-                                            }
-                                            else if (targetType == typeof(DateTime))
-                                            {
-                                                if (DateTime.TryParse(cellValue, out DateTime dateValue))
-                                                {
-                                                    dr[columnName] = dateValue;
-                                                }
-                                                else
-                                                {
-                                                    dr[columnName] = DBNull.Value;
-                                                }
+                                                value = dateValue;
                                             }
                                             else
                                             {
-                                                dr[columnName] = Convert.ChangeType(cellValue, targetType);
+                                                value = DBNull.Value;
                                             }
                                         }
-                                        catch (Exception ex)
+                                        else
                                         {
-                                            Console.WriteLine($"Error converting column '{columnName}' with value '{cellValue}': {ex.Message}");
-                                            dr[columnName] = DBNull.Value;
+                                            value = Convert.ChangeType(cellValue, targetType);
                                         }
-                                    }
-                                    else
-                                    {
-                                        dr[columnName] = cellValue;
-                                    }
-                                }
-
-                                dataTable.Rows.Add(dr);
-                                rowCount++;
-                                totalRowCount++;
-
-                                // Jeśli osiągnięto rozmiar partii, wyślij dane do bazy
-                                if (rowCount >= batchSize)
-                                {
-                                    try
-                                    {
-                                        bulkCopy.WriteToServer(dataTable);
-                                        dataTable.Clear();
-                                        rowCount = 0;
-                                        Console.WriteLine($"{totalRowCount} rows processed and saved to database.");
                                     }
                                     catch (Exception ex)
                                     {
-                                        Console.WriteLine($"Error during sending data: {ex.Message}");
-                                        return false;
+                                        Console.WriteLine($"Błąd konwersji kolumny '{sourceColumnName}' z wartością '{cellValue}': {ex.Message}");
+                                        value = DBNull.Value;
+                                    }
+
+                                    // Zapisanie wartości do importera
+                                    if (value == DBNull.Value)
+                                    {
+                                        writer.WriteNull();
+                                    }
+                                    else
+                                    {
+                                        // Pobranie odpowiedniego NpgsqlDbType
+                                        if (typeMapping.TryGetValue(targetType, out NpgsqlDbType npgsqlDbType))
+                                        {
+                                            writer.Write(value, npgsqlDbType);
+                                        }
+                                        else
+                                        {
+                                            // Jeśli typ nie jest zmapowany, użyj metody Write(object)
+                                            writer.Write(value);
+                                        }
                                     }
                                 }
-                            }
 
-                            // Wyślij pozostałe dane
-                            if (dataTable.Rows.Count > 0)
-                            {
-                                try
+                                totalRowCount++;
+                                if (totalRowCount % 10000 == 0)
                                 {
-                                    bulkCopy.WriteToServer(dataTable);
-                                    dataTable.Clear();
-                                    Console.WriteLine($"Last part {dataTable.Rows.Count} rows processed and saved to database.");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Error during sending data: {ex.Message}");
-                                    return false;
+                                    Console.WriteLine($"{totalRowCount} wierszy przetworzono.");
                                 }
                             }
                         }
+
+                        writer.Complete(); // Zakończenie importu
                     }
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Błąd: {ex.Message}");
                 return false;
             }
         }
-
     }
 }

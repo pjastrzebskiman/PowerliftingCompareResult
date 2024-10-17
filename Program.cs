@@ -17,35 +17,24 @@ builder.Services.AddSwaggerGen();
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();/* (c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    c.RoutePrefix = "docs";
-    c.DocumentTitle = "My Swagger";
-});
-*/
-
+app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+app.MapControllers();
 
 
 
