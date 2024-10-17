@@ -1,25 +1,25 @@
-# Etap 1: Budowanie aplikacji
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Kopiuj plik projektu i przywróć zależności
+# Install Node.js (for frontend dependencies)
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs
+
+# Copy csproj and restore as distinct layers
 COPY *.csproj ./
 RUN dotnet restore
 
-# Kopiuj resztę plików i zbuduj aplikację
+# Copy everything else and build the application
 COPY . ./
-RUN dotnet publish -c Release -o out
+RUN npm install   # Instalacja zależności frontendu
+RUN dotnet publish -c Release -o /out
 
-# Etap 2: Tworzenie obrazu runtime
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /out .
 
-# Ustawienie zmiennej środowiskowej ASPNETCORE_URLS
-ENV ASPNETCORE_URLS=http://+:8080
-
-# Eksponuj port
-EXPOSE 8080
-
-# Ustawienie punktu wejścia
+# Expose port (jeśli API nasłuchuje na danym porcie)
+EXPOSE 80
 ENTRYPOINT ["dotnet", "PowerliftingCompareResult.dll"]
