@@ -1,4 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PowerliftingCompareResult.Models;
 
@@ -21,7 +21,7 @@ namespace PowerliftingCompareResult.Controllers
         {
             try
             {
-               // _context.Database.ExecuteSqlRaw("CALL \"FIX_ROUND_RESULT\"();");
+                 _context.Database.ExecuteSqlRaw("CALL \"FIX_ROUND_RESULT\"();");
                 return Ok("Procedure 'FIX_ROUND_RESULT' was executed successfully.");
             }
             catch (Exception ex)
@@ -32,19 +32,4 @@ namespace PowerliftingCompareResult.Controllers
     }
 
 }
-*/
-using Microsoft.AspNetCore.Mvc;
 
-namespace PowerliftingCompareResult.Controllers
-{
-    [ApiController]
-    [Route("[controller]")]
-    public class FixRoundResultController : ControllerBase
-    {
-        [HttpPost("ExecuteProcedure")]
-        public IActionResult ExecuteProcedure()
-        {
-            return Ok("Endpoint is working.");
-        }
-    }
-}
