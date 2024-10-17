@@ -10,16 +10,17 @@ RUN dotnet restore
 COPY . ./
 RUN dotnet publish -c Release -o /out
 
-# Build stage for React frontend in clientapp folder
+# Build stage for React frontend in ClientApp folder
 FROM node:16 AS build-frontend
 WORKDIR /app
 
-# Copy frontend package.json and package-lock.json (if exists) to the container
-COPY ./ClientApp/package*.json ./
+# Copy package.json and package-lock.json from ClientApp
+COPY ClientApp/package*.json ./ClientApp/
+WORKDIR /app/ClientApp
 RUN npm install
 
 # Copy the rest of the frontend files and build it
-COPY ./clientapp ./
+COPY ClientApp/ ./
 RUN npm run build
 
 # Runtime stage (final image)
@@ -30,7 +31,7 @@ WORKDIR /app
 COPY --from=build-backend /out .
 
 # Copy frontend build files to the appropriate folder in the backend (for serving static files)
-COPY --from=build-frontend /app/build ./wwwroot
+COPY --from=build-frontend /app/ClientApp/build ./wwwroot
 
 # Expose port (adjust if necessary)
 EXPOSE 80
