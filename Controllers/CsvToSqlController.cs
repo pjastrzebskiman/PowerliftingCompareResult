@@ -141,7 +141,7 @@ namespace PowerliftingCompareResult.Controllers
                     string TableName2 = "public.\"LiftResults\"";
                     string copyCommand = $"COPY {TableName2} ({string.Join(",", columnsToWrite.Select(c => "\"" + c.TargetColumnName + "\""))}) FROM STDIN (FORMAT BINARY)";
                     Console.WriteLine($"Polecenie COPY: {copyCommand}");
-
+                    Console.WriteLine($"Pobieranie pliku CSV z adresu: {csvFilePath}");
                     using (var writer = connection.BeginBinaryImport(copyCommand))
                     {
                         using (var response = await _httpClient.GetAsync(csvFilePath, HttpCompletionOption.ResponseHeadersRead))
