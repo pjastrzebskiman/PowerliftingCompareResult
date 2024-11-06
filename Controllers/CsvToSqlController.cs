@@ -17,11 +17,13 @@ namespace PowerliftingCompareResult.Controllers
     {
         private readonly CsvSettings _csvToSql;
         private readonly HttpClient _httpClient;
+        private readonly ResultContext _context;
 
-        public CsvToSqlController(IOptions<CsvSettings> csvToSql, HttpClient httpClient)
+        public CsvToSqlController(IOptions<CsvSettings> csvToSql, HttpClient httpClient, ResultContext context)
         {
             _csvToSql = csvToSql.Value;
             _httpClient = httpClient;
+             _context = context;
         }
 
         [HttpPost]
@@ -29,7 +31,8 @@ namespace PowerliftingCompareResult.Controllers
         {
             try
             {
-                bool isSuccess = await ImportSelectedColumsFromCsvToDbAsync(_csvToSql.FilePath, _csvToSql.Connectionstring, _csvToSql.TableName, _csvToSql.SelectedColumns);
+                string connectionString = _context.Database.GetDbConnection().ConnectionString;
+                bool isSuccess = await ImportSelectedColumsFromCsvToDbAsync(_csvToSql.FilePath, connectionString, _csvToSql.TableName, _csvToSql.SelectedColumns);
 
                 if (isSuccess)
                 {
