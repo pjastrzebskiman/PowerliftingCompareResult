@@ -33,6 +33,8 @@ namespace PowerliftingCompareResult.Controllers
             try
             {
                 string connectionString = _context.Database.GetDbConnection().ConnectionString;
+                _csvToSql.FilePath = Environment.GetEnvironmentVariable("YOUR_FILE") ?? throw new InvalidOperationException("CSV_FILE_URL environment variable is not set.");
+
                 bool isSuccess = await ImportSelectedColumsFromCsvToDbAsync(_csvToSql.FilePath, _csvToSql.TableName, _csvToSql.SelectedColumns);
 
                 if (isSuccess)
@@ -141,12 +143,12 @@ namespace PowerliftingCompareResult.Controllers
                     string TableName2 = "public.\"LiftResults\"";
                     string copyCommand = $"COPY {TableName2} ({string.Join(",", columnsToWrite.Select(c => "\"" + c.TargetColumnName + "\""))}) FROM STDIN (FORMAT BINARY)";
                     Console.WriteLine($"Polecenie COPY: {copyCommand}");
+                    
                     Console.WriteLine($"Pobieranie pliku CSV z adresu: {csvFilePath}");
                     using (var writer = connection.BeginBinaryImport(copyCommand))
                     {
                         using (var response = await _httpClient.GetAsync(csvFilePath, HttpCompletionOption.ResponseHeadersRead))
                         {
-                        Console.WriteLine($"Pobieranie pliku CSV z adresu: {csvFilePath}");
                             response.EnsureSuccessStatusCode();
                             using (var responseStream = await response.Content.ReadAsStreamAsync())
                             using (var sr = new StreamReader(responseStream))
