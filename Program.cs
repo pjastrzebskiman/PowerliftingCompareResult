@@ -15,7 +15,7 @@ string dbUser = Environment.GetEnvironmentVariable("YOUR_USER");
 string dbPassword = Environment.GetEnvironmentVariable("YOUR_PASSWORD");
 
 string connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
-
+Console.WriteLine($"Connection strong to db PJ : : {connectionString}");
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ResultContext>(options =>
