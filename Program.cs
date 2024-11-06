@@ -11,7 +11,7 @@ Console.WriteLine($"Port from environment variable: {port}");
 string dbHost = Environment.GetEnvironmentVariable("YOUR_HOST");
 string dbPort = Environment.GetEnvironmentVariable("YOUR_PORT"); 
 string dbName = Environment.GetEnvironmentVariable("YOUR_DATABASE");
-string dbUser = Environment.GetEnvironmentVariable("YOUR_USER");
+string dbUser = Environment.GetEnvironmentVariable("YOUR_USERNAME");
 string dbPassword = Environment.GetEnvironmentVariable("YOUR_PASSWORD");
 
 string connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
