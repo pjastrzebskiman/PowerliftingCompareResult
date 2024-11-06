@@ -8,9 +8,18 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 Console.WriteLine($"Port from environment variable: {port}");
 // Add services to the container.
 
+string dbHost = Environment.GetEnvironmentVariable("YOUR_HOST");
+string dbPort = Environment.GetEnvironmentVariable("YOUR_PORT"); 
+string dbName = Environment.GetEnvironmentVariable("YOUR_DATABASE");
+string dbUser = Environment.GetEnvironmentVariable("YOUR_USER");
+string dbPassword = Environment.GetEnvironmentVariable("YOUR_PASSWORD");
+
+string connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ResultContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ResultContextConnectionString")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.Configure<CsvSettings>(builder.Configuration.GetSection("ImportFormCsv"));
 builder.Services.AddEndpointsApiExplorer();
