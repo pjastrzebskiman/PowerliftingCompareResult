@@ -32,7 +32,7 @@ namespace PowerliftingCompareResult.Controllers
             try
             {
                 string connectionString = _context.Database.GetDbConnection().ConnectionString;
-                bool isSuccess = await ImportSelectedColumsFromCsvToDbAsync(_csvToSql.FilePath, connectionString, _csvToSql.TableName, _csvToSql.SelectedColumns);
+                bool isSuccess = await ImportSelectedColumsFromCsvToDbAsync(_csvToSql.FilePath, _csvToSql.TableName, _csvToSql.SelectedColumns);
 
                 if (isSuccess)
                 {
@@ -51,7 +51,7 @@ namespace PowerliftingCompareResult.Controllers
         }
 
 
-        private async Task<bool> ImportSelectedColumsFromCsvToDbAsync(string csvFilePath, string connectionString, string TableName, string[] selectedColumns)
+        private async Task<bool> ImportSelectedColumsFromCsvToDbAsync(string csvFilePath, string TableName, string[] selectedColumns)
         {
             try
             {
@@ -125,7 +125,8 @@ namespace PowerliftingCompareResult.Controllers
             { typeof(DateTime), NpgsqlDbType.Timestamp }
         };
 
-                using (var connection = new NpgsqlConnection(connectionString))
+            using (var connection = _context.Database.GetDbConnection() as NpgsqlConnection)
+
                 {
                     await connection.OpenAsync();
 
