@@ -146,6 +146,7 @@ namespace PowerliftingCompareResult.Controllers
                     {
                         using (var response = await _httpClient.GetAsync(csvFilePath, HttpCompletionOption.ResponseHeadersRead))
                         {
+                        Console.WriteLine($"Pobieranie pliku CSV z adresu: {csvFilePath}");
                             response.EnsureSuccessStatusCode();
                             using (var responseStream = await response.Content.ReadAsStreamAsync())
                             using (var sr = new StreamReader(responseStream))
