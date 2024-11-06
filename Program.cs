@@ -5,6 +5,7 @@ using PowerliftingCompareResult.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+Console.WriteLine($"Port from environment variable: {port}");
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
