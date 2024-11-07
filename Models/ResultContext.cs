@@ -12,10 +12,12 @@ namespace PowerliftingCompareResult.Models
 
         }
         public  DbSet <LiftResult> LiftResults { get; set; }
+        public DbSet<Countries> Countries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LiftResult>().HasNoKey();
+            modelBuilder.Entity<Countries>().HasNoKey();
         }
 
      
