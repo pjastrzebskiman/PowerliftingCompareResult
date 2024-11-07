@@ -106,9 +106,9 @@ const YourResult = () => {
                     <label>Country: </label>
                     <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)}>
                         <option value="">All countries</option>
-                        {countries.map((country) => (
-                            <option key={country} value={country}>
-                                {country}
+                        {countries.map((item) => (
+                            <option key={item.country} value={item.country}>
+                                {item.country}
                             </option>
                         ))}
                     </select>

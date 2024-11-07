@@ -157,12 +157,8 @@ namespace PowerliftingCompareResult.Controllers
         {
             try
             {
-                var countries = _context.LiftResults
-      .Where(lr => lr.Country != null && lr.Country != "")
-      .Select(lr => lr.Country)
-      .Distinct()
-      .OrderBy(c => c)
-      .ToList();
+                var countries = _context.Countries
+                    .ToList();
 
 
                 return Ok(countries);
